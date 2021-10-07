@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+    db_postgres: 
+        image: postgres:10
+        environment:
+            POSTGRES_PASSWORD: 'Password@123'
+            POSTGRES_USER: 'pgsql_user'
+            POSTGRES_DB: 'cloud_services'
+        ports: 
+        - 5433:5432
