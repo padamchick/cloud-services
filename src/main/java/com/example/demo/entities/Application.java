@@ -2,11 +2,13 @@ package com.example.demo.entities;
 
 import com.example.demo.dto.ApplicationState;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
+@NoArgsConstructor
 @Getter @Setter
 public class Application {
     @Id
@@ -17,4 +19,11 @@ public class Application {
     @Enumerated(EnumType.STRING)
     private ApplicationState state;
 
+    private String comment;
+    private Long bid;
+
+    public Application(String name, String content) {
+        this.name = name;
+        this.content = content;
+    }
 }
