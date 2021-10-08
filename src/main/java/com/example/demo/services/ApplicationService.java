@@ -3,6 +3,8 @@ package com.example.demo.services;
 import com.example.demo.dto.ApplicationState;
 import com.example.demo.dto.FilteringCriteria;
 import com.example.demo.entities.Application;
+import com.example.demo.exceptions.EntityNotFoundException;
+import com.example.demo.exceptions.UpgradeException;
 import com.example.demo.repositories.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ public class ApplicationService {
 
     @Transactional
     public void updateApplicationContent(Long id, String content) {
-        Application application = applicationRepository.findById(id).orElseThrow(() -> new RuntimeException("application not found"));
+        Application application = applicationRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("application with id " + id + " not found"));
         if(application.getState() == ApplicationState.CREATED || application.getState() == ApplicationState.VERIFIED) {
             application.setContent(content);
         } else {
@@ -38,7 +40,7 @@ public class ApplicationService {
 
     @Transactional
     public void upgradeApplicationStatus(Long id, ApplicationState state, String comment) {
-        Application application = applicationRepository.findById(id).orElseThrow(() -> new RuntimeException("application not found"));
+        Application application = applicationRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("application with id " + id + " not found"));
         switch (state) {
             case DELETED:
                 deleteApplication(application, comment);
@@ -56,16 +58,16 @@ public class ApplicationService {
                 publishApplication(application);
                 break;
             default:
-                throw new RuntimeException("wrong application state");
+                throw new UpgradeException("wrong application state");
         }
     }
 
     private void deleteApplication(Application application, String comment) {
         if(application.getState() != ApplicationState.CREATED) {
-            throw new RuntimeException("you cannot delete the application in "+ application.getState().name().toLowerCase() + " state");
+            throw new UpgradeException("you cannot delete the application in "+ application.getState().name().toLowerCase() + " state");
         }
         if(comment == null) {
-            throw new RuntimeException("you did not provide the reason of deletion");
+            throw new UpgradeException("you did not provide the reason of deletion");
         }
         application.setState(ApplicationState.DELETED);
         application.setComment(comment);
@@ -73,24 +75,24 @@ public class ApplicationService {
 
     private void verifyApplication(Application application) {
         if(application.getState() != ApplicationState.CREATED) {
-            throw new RuntimeException("you cannot verify the application in "+ application.getState().name().toLowerCase() + " state");
+            throw new UpgradeException("you cannot verify the application in "+ application.getState().name().toLowerCase() + " state");
         }
         application.setState(ApplicationState.VERIFIED);
     }
 
     private void acceptApplication(Application application) {
         if(application.getState() != ApplicationState.VERIFIED) {
-            throw new RuntimeException("you cannot accept the application in "+ application.getState().name().toLowerCase() + " state");
+            throw new UpgradeException("you cannot accept the application in "+ application.getState().name().toLowerCase() + " state");
         }
         application.setState(ApplicationState.ACCEPTED);
     }
 
     private void rejectApplication(Application application, String comment) {
         if(application.getState() != ApplicationState.VERIFIED && application.getState() != ApplicationState.ACCEPTED) {
-            throw new RuntimeException("you cannot reject the application in "+ application.getState().name().toLowerCase() + " state");
+            throw new UpgradeException("you cannot reject the application in "+ application.getState().name().toLowerCase() + " state");
         }
         if(comment == null) {
-            throw new RuntimeException("you did not provide the reason of rejection");
+            throw new UpgradeException("you did not provide the reason of rejection");
         }
         application.setState(ApplicationState.REJECTED);
         application.setComment(comment);
@@ -98,7 +100,7 @@ public class ApplicationService {
 
     private void publishApplication(Application application) {
         if(application.getState() != ApplicationState.ACCEPTED) {
-            throw new RuntimeException("you cannot publish the application in "+ application.getState().name().toLowerCase() + " state");
+            throw new UpgradeException("you cannot publish the application in "+ application.getState().name().toLowerCase() + " state");
         }
         application.setState(ApplicationState.PUBLISHED);
         application.setBid(generateNewBid());
