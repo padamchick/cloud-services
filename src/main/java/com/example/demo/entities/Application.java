@@ -4,12 +4,14 @@ import com.example.demo.dto.ApplicationState;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
 @Getter @Setter
+@Audited
 public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
