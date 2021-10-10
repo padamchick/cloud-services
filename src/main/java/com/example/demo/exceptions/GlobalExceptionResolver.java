@@ -10,8 +10,8 @@ import static org.springframework.http.ResponseEntity.*;
 @ControllerAdvice
 public class GlobalExceptionResolver {
 
-    @ExceptionHandler(UpgradeException.class)
-    public ResponseEntity<Object> handleUpgradeException(UpgradeException ex) {
+    @ExceptionHandler(UpdateException.class)
+    public ResponseEntity<Object> handleUpgradeException(UpdateException ex) {
         ErrorResponse response = new ErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value());
         return badRequest().body(response);
     }

@@ -1,6 +1,7 @@
 package com.example.demo.entities;
 
 import com.example.demo.dto.ApplicationState;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter @Setter
 @Audited
 public class Application {
